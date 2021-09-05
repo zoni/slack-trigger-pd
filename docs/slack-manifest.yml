@@ -1,0 +1,26 @@
+_metadata:
+  major_version: 1
+  minor_version: 1
+display_information:
+  name: slack-trigger-pd
+features:
+  bot_user:
+    display_name: slack-trigger-pd
+    always_online: false
+  slash_commands:
+    - command: /incident
+      url: https://${YOUR_PUBLIC_URL}/slackhandler
+      description: Open a new PagerDuty incident
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - commands
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://${YOUR_PUBLIC_URL}/slackhandler
+    message_menu_options_url: https://${YOUR_PUBLIC_URL}/slackhandler
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

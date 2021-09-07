@@ -14,8 +14,8 @@ Also, it's only been tested locally (`func start`, requires [Azure Functions Cor
 ## To-do
 
 - [ ] Verify requests come from Slack
-- [ ] Reduce duplication in PagerDuty API client
-- [ ] Proper error handling in PagerDuty API client
+- [x] Reduce duplication in PagerDuty API client
+- [x] Proper error handling in PagerDuty API client
 - [ ] Set limit=100 on PagerDuty services API call
 - [ ] Tests
 - [ ] More extensive typing

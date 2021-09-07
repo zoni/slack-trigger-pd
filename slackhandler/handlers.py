@@ -38,12 +38,13 @@ async def handle_view_submission(
     state, req: func.HttpRequest, view_payload
 ) -> func.HttpResponse:
     form_values = view_payload["view"]["state"]["values"]
-    await state.pd_client.create_incident(
+    incident_info = await state.pd_client.create_incident(
         service_id=form_values["service"]["service_value"]["selected_option"]["value"],
         from_email=os.environ["PAGERDUTY_USER_EMAIL"],
         title=form_values["title"]["title_value"]["value"],
         description=form_values["description"]["description_value"]["value"],
     )
+    # TODO: This should present feedback to user about the opened incident.
     return func.HttpResponse("", status_code=200)
 
 

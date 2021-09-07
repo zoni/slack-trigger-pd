@@ -12,11 +12,7 @@ from slackhandler.modals import incident_modal_payload
 
 async def handle_incident_trigger(state, req: func.HttpRequest) -> func.HttpResponse:
     await present_incident_modal(state, req)
-    return func.HttpResponse(
-        ":hourglass_flowing_sand: Please wait while I get the list of PagerDuty "
-        "services available...",
-        status_code=200,
-    )
+    return func.HttpResponse("", status_code=200)
 
 
 async def handle_block_suggestion(state, req: func.HttpRequest) -> func.HttpResponse:

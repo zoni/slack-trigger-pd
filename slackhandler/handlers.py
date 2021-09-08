@@ -7,7 +7,7 @@ import azure.functions as func
 from slack_sdk.web.async_client import AsyncWebClient as SlackWebClient
 
 import pagerduty
-from slackhandler.modals import incident_modal_payload
+from slackhandler.modals import incident_modal_payload, incident_created_modal_payload
 
 
 async def handle_incident_trigger(state, req: func.HttpRequest) -> func.HttpResponse:
@@ -44,8 +44,11 @@ async def handle_view_submission(
         title=form_values["title"]["title_value"]["value"],
         description=form_values["description"]["description_value"]["value"],
     )
-    # TODO: This should present feedback to user about the opened incident.
-    return func.HttpResponse("", status_code=200)
+    return func.HttpResponse(
+        json.dumps(incident_created_modal_payload(incident_info)),
+        status_code=200,
+        headers={"Content-Type": "application/json"},
+    )
 
 
 async def present_incident_modal(state, req: func.HttpRequest):

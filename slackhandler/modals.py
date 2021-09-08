@@ -55,3 +55,22 @@ def incident_modal_payload():
             },
         ],
     }
+
+
+def incident_created_modal_payload(pd_api_response):
+    # TODO: Use some of the data from pd_api_response to give back a more
+    # meaningful response.
+    return {
+        "response_action": "update",
+        "view": {
+            "type": "modal",
+            "title": {"type": "plain_text", "text": "Success"},
+            "close": {"type": "plain_text", "text": "Close"},
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {"type": "plain_text", "text": "Incident created"},
+                }
+            ],
+        },
+    }

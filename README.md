@@ -14,13 +14,10 @@ Also, it's only been tested locally (`func start`, requires [Azure Functions Cor
 ## To-do
 
 - [ ] Verify requests come from Slack
-- [x] Reduce duplication in PagerDuty API client
-- [x] Proper error handling in PagerDuty API client
-- [ ] Set limit=100 on PagerDuty services API call
 - [ ] Tests
 - [ ] More extensive typing
-- [ ] Support > 100 services in PagerDuty services API call
-- [ ] Display user feedback after opening incidents
+- [x] Support > 100 services in PagerDuty services API call
+- [x] Display user feedback after opening incidents
 - [ ] Attach more Slack metadata to opened incidents
 
 ## License

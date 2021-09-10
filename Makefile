@@ -5,8 +5,13 @@ SHELL := bash
 .ONESHELL:
 .SHELLFLAGS := -euo pipefail -c
 
+ALL_PY_FILES := $(wildcard **/*.py)
+
 .PHONY: all
-all: install-deps requirements.txt
+all: install-deps requirements.txt lint-all
+
+.PHONY: lint-all
+lint-all: linter-mypy linter-pylint
 
 .PHONY: install-deps
 install-deps: pyproject.toml
@@ -19,3 +24,11 @@ requirements.txt: pyproject.toml
 serve-local:
 	ngrok http 7071 --log stderr --log-format term --inspect &
 	poetry run func start
+
+.PHONY: linter-mypy
+linter-mypy:
+	poetry run mypy $(ALL_PY_FILES)
+
+.PHONY: linter-pylint
+linter-pylint:
+	poetry run pylint $(ALL_PY_FILES)

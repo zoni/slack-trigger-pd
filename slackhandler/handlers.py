@@ -1,21 +1,25 @@
-import asyncio
+import uuid
 import json
-import logging
-import os
 import azure.functions as func
 
-from slack_sdk.web.async_client import AsyncWebClient as SlackWebClient
-
-import pagerduty
 from slackhandler.modals import incident_modal_payload, incident_created_modal_payload
 
 
-async def handle_incident_trigger(state, req: func.HttpRequest) -> func.HttpResponse:
-    await present_incident_modal(state, req)
+def handle_incident_trigger(state, req: func.HttpRequest) -> func.HttpResponse:
+    """Handler for the `/incident` slash command"""
+    state.slack_client.views_open(
+        trigger_id=req.form["trigger_id"],
+        view=incident_modal_payload(),
+    )
     return func.HttpResponse("", status_code=200)
 
 
-async def handle_block_suggestion(state, req: func.HttpRequest) -> func.HttpResponse:
+def handle_block_suggestion(state, _req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Handler for Slack's block_suggestion event.
+
+    This is called to get items for the "Affected service" selection dropdown.
+    """
     service_selections = [
         {
             "value": service["id"],
@@ -24,9 +28,8 @@ async def handle_block_suggestion(state, req: func.HttpRequest) -> func.HttpResp
                 "text": service["name"],
             },
         }
-        for service in await state.get_pagerduty_services()
+        for service in state.get_pagerduty_services()
     ]
-    logging.info("Returning options: %s", service_selections)
     return func.HttpResponse(
         json.dumps({"options": service_selections}),
         status_code=200,
@@ -34,30 +37,39 @@ async def handle_block_suggestion(state, req: func.HttpRequest) -> func.HttpResp
     )
 
 
-async def handle_view_submission(
-    state, req: func.HttpRequest, view_payload
+def handle_view_submission(
+    state, _req: func.HttpRequest, view_payload
 ) -> func.HttpResponse:
+    """
+    Handler for Slack's view_submission event.
+
+    This is called when a user presses Submit on the modal created by
+    `handle_incident_trigger`.
+    """
     form_values = view_payload["view"]["state"]["values"]
-    incident_info = await state.pd_client.create_incident(
-        service_id=form_values["service"]["service_value"]["selected_option"]["value"],
-        from_email=os.environ["PAGERDUTY_USER_EMAIL"],
-        title=form_values["title"]["title_value"]["value"],
-        description=form_values["description"]["description_value"]["value"],
+
+    service_id = form_values["service"]["service_value"]["selected_option"]["value"]
+    title = form_values["title"]["title_value"]["value"]
+    description = form_values["description"]["description_value"]["value"]
+
+    incident_info = state.pd_client.rpost(
+        "/incidents",
+        json={
+            "incident": {
+                "type": "incident",
+                "title": title,
+                "service": {"id": service_id, "type": "service_reference"},
+                "urgency": "high",
+                "incident_key": uuid.uuid4().hex,
+                "body": {
+                    "type": "incident_body",
+                    "details": description,
+                },
+            }
+        },
     )
     return func.HttpResponse(
         json.dumps(incident_created_modal_payload(incident_info)),
         status_code=200,
         headers={"Content-Type": "application/json"},
-    )
-
-
-async def present_incident_modal(state, req: func.HttpRequest):
-    slack_client = SlackWebClient(
-        token=os.environ["SLACK_API_TOKEN"],
-        session=state.http_client,
-    )
-
-    await slack_client.views_open(
-        trigger_id=req.form["trigger_id"],
-        view=incident_modal_payload(),
     )

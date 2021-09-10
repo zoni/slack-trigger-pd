@@ -1,4 +1,5 @@
 def incident_modal_payload():
+    """Return the Slack Block Kit payload for the "Create new incident" modal"""
     return {
         "type": "modal",
         "submit": {"type": "plain_text", "text": "Submit", "emoji": True},
@@ -58,6 +59,7 @@ def incident_modal_payload():
 
 
 def incident_created_modal_payload(pd_api_response):
+    """Return the Slack Block Kit payload for the "Incident created" modal"""
     # TODO: Use some of the data from pd_api_response to give back a more
     # meaningful response.
     return {

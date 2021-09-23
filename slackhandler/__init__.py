@@ -46,7 +46,14 @@ def _handle_request(req: func.HttpRequest) -> func.HttpResponse:
     if command == "/incident":
         return handle_incident_trigger(_state, req)
 
-    payload = json.loads(req.form.get("payload"))
+    try:
+        payload = json.loads(req.form.get("payload"))
+    except TypeError:
+        return func.HttpResponse(
+            "Error: request payload not supported",
+            status_code=400,
+        )
+
     if payload.get("type") == "block_suggestion":
         return handle_block_suggestion(_state, req)
     if payload.get("type") == "view_submission":

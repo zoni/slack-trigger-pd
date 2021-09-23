@@ -20,6 +20,14 @@ Also, it's only been tested locally (`func start`, requires [Azure Functions Cor
 - [x] Display user feedback after opening incidents
 - [ ] Attach more Slack metadata to opened incidents
 
+## Installing into a Slack workspace
+
+1. Visit <https://api.slack.com/apps/> and click _Create New App_.
+2. Choose _From an app manifest_ and select the desired workspace.
+3. Paste in the contents from `slack-app-manifest.yml`, making sure to replace `${FUNCTIONS_APP_DOMAIN}` with the endpoint of your deployed Azure Functions app. 
+    - Hint: envsubst can be helpful here, try: `FUNCTIONS_APP_DOMAIN=your-function-name.azurewebsites.net envsubst < slack-app-manifest.yml`)
+4. Review and complete the installation, then proceed with _Install to Workspace_.
+
 ## License
 
 This software is dual-licensed under the [Apache 2.0](LICENSE-APACHE) and the [MIT](LICENSE-MIT) licenses.

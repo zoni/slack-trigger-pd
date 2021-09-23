@@ -9,7 +9,7 @@ features:
     always_online: false
   slash_commands:
     - command: /incident
-      url: https://${YOUR_PUBLIC_URL}/slackhandler
+      url: https://${FUNCTIONS_APP_DOMAIN}/slackhandler
       description: Open a new PagerDuty incident
       should_escape: false
 oauth_config:
@@ -19,8 +19,8 @@ oauth_config:
 settings:
   interactivity:
     is_enabled: true
-    request_url: https://${YOUR_PUBLIC_URL}/slackhandler
-    message_menu_options_url: https://${YOUR_PUBLIC_URL}/slackhandler
+    request_url: https://${FUNCTIONS_APP_DOMAIN}/slackhandler
+    message_menu_options_url: https://${FUNCTIONS_APP_DOMAIN}/slackhandler
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false

@@ -6,6 +6,7 @@ import azure.functions as func
 import pdpyras
 
 from slack_sdk.web.client import WebClient as SlackWebClient
+from slack_sdk.signature import SignatureVerifier
 
 from slackhandler.handlers import (
     handle_incident_trigger,
@@ -26,8 +27,8 @@ if (SENTRY_DSN := os.environ.get("SENTRY_DSN")) is not None:
 # See also:
 # https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=azurecli-linux%2Capplication-level#global-variables
 _pd_client = pdpyras.APISession(
-    os.environ["PAGERDUTY_API_KEY"], default_from=os.environ["PAGERDUTY_USER_EMAIL"]
-)
+    os.environ["PAGERDUTY_API_KEY"],
+    default_from=os.environ["PAGERDUTY_USER_EMAIL"])
 _slack_client = SlackWebClient(token=os.environ["SLACK_API_TOKEN"])
 _state = State(pd_client=_pd_client, slack_client=_slack_client)
 
@@ -42,6 +43,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def _handle_request(req: func.HttpRequest) -> func.HttpResponse:
     global _state  # pylint: disable=invalid-name
+
+    signature_verifier = SignatureVerifier(os.environ["SLACK_SIGNING_SECRET"])
+    if not signature_verifier.is_valid_request(req.get_body(), req.headers):
+        return func.HttpResponse(
+            "Unauthorized: missing or invalid Slack signature",
+            status_code=403,
+        )
+
     command = req.form.get("command")
     if command == "/incident":
         return handle_incident_trigger(_state, req)

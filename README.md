@@ -13,7 +13,7 @@ Also, it's only been tested locally (`func start`, requires [Azure Functions Cor
 
 ## To-do
 
-- [ ] Verify requests come from Slack
+- [x] Verify requests come from Slack
 - [ ] Tests
 - [ ] More extensive typing
 - [x] Support > 100 services in PagerDuty services API call

@@ -46,6 +46,14 @@ def _handle_request(req: func.HttpRequest) -> func.HttpResponse:
 
     signature_verifier = SignatureVerifier(os.environ["SLACK_SIGNING_SECRET"])
     if not signature_verifier.is_valid_request(req.get_body(), req.headers):
+        # req.headers doesn't have a proper __str__ or __repr__ defined, so
+        # trying to print it results in a
+        # "<azure.functions._http.HttpRequestHeaders object at 0x7faac2cf0280>"
+        # representation without the __dict__ hack.
+        logging.warning(
+            "Missing or invalid Slack signature on request. Secret=%s, Headers=%s",
+            os.environ["SLACK_SIGNING_SECRET"],
+            req.headers.__dict__['__http_headers__'])
         return func.HttpResponse(
             "Unauthorized: missing or invalid Slack signature",
             status_code=403,

@@ -18,7 +18,6 @@ class State:
           only has 3 seconds to respond to Slack requests, so if PagerDuty's
           API were to be slow, we might miss this deadline.
     """
-
     def __init__(
         self,
         pd_client: pdpyras.APISession,
@@ -50,5 +49,8 @@ class State:
                 return self._pd_services
 
             logger.info("Returning PagerDuty services from API")
-            self._pd_services = self.pd_client.iter_all("/services")
+            # iter_all() returns a generator, so the wrapping with list() here
+            # ensures we save the result of it into the cache, rather than the
+            # generator object itself.
+            self._pd_services = list(self.pd_client.iter_all("/services"))
             return self._pd_services

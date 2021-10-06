@@ -63,7 +63,7 @@ def handle_view_submission(
                 "incident_key": uuid.uuid4().hex,
                 "body": {
                     "type": "incident_body",
-                    "details": description,
+                    "details": description or "<no description>",
                 },
             }
         },

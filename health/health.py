@@ -41,6 +41,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             try:
                 results[check] = future.result()
             except Exception as exception:
+                # Stringifying the exception and including it in the HTTP
+                # response text assumes libraries are well-behaved and don't
+                # leak sensitive information through their exceptions. This
+                # should be the case for pdpyras and slack_sdk.
                 results[check] = "ERROR: " + str(exception).replace("\n", " ")
                 failures = True
 

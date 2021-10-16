@@ -1,3 +1,12 @@
+def slack_escape(text: str) -> str:
+    """
+    Escape special control characters in text formatted for Slack's markup.
+
+    This applies escaping rules as documented on https://api.slack.com/reference/surfaces/formatting#escaping
+    """
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def incident_modal_payload():
     """Return the Slack Block Kit payload for the "Create new incident" modal"""
     return {
@@ -60,8 +69,7 @@ def incident_modal_payload():
 
 def incident_created_modal_payload(pd_api_response):
     """Return the Slack Block Kit payload for the "Incident created" modal"""
-    # TODO: Use some of the data from pd_api_response to give back a more
-    # meaningful response.
+    safe_summary = slack_escape(pd_api_response["summary"])
     return {
         "response_action": "update",
         "view": {
@@ -71,8 +79,11 @@ def incident_created_modal_payload(pd_api_response):
             "blocks": [
                 {
                     "type": "section",
-                    "text": {"type": "plain_text", "text": "Incident created"},
-                }
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*The incident <{pd_api_response['html_url']}|{safe_summary}> was successfully created*",
+                    },
+                },
             ],
         },
     }

@@ -46,11 +46,20 @@ def handle_view_submission(
     This is called when a user presses Submit on the modal created by
     `handle_incident_trigger`.
     """
+    # The user attribute in view_payload only contains the user `id`,
+    # `team_id`, `username` and `name` attributes. Slack API docs mention
+    # `name` is deprecated and should not be used. This leaves us with `name`
+    # (holding the user's @username) as the only usable attribute.
+    slack_username = view_payload["user"]["username"]
     form_values = view_payload["view"]["state"]["values"]
 
     service_id = form_values["service"]["service_value"]["selected_option"]["value"]
     title = form_values["title"]["title_value"]["value"]
     description = form_values["description"]["description_value"]["value"]
+
+    incident_body = f"This incident was created via Slack by {slack_username}"
+    if description is not None and description.strip() != "":
+        incident_body += f" with the following description:\n\n{description}"
 
     incident_info = state.pd_client.rpost(
         "/incidents",
@@ -61,10 +70,7 @@ def handle_view_submission(
                 "service": {"id": service_id, "type": "service_reference"},
                 "urgency": "high",
                 "incident_key": uuid.uuid4().hex,
-                "body": {
-                    "type": "incident_body",
-                    "details": description or "<no description>",
-                },
+                "body": {"type": "incident_body", "details": incident_body},
             }
         },
     )

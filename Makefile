@@ -20,9 +20,12 @@ install-deps: pyproject.toml
 requirements.txt: pyproject.toml
 	poetry export --without-hashes > requirements.txt
 
+.PHONY: ngrok
+ngrok:
+	ngrok http 7071
+
 .PHONY: serve-local
 serve-local:
-	ngrok http 7071 --log stderr --log-format term --inspect &
 	poetry run func start
 
 .PHONY: linter-mypy

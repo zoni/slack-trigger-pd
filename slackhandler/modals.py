@@ -2,7 +2,8 @@ def slack_escape(text: str) -> str:
     """
     Escape special control characters in text formatted for Slack's markup.
 
-    This applies escaping rules as documented on https://api.slack.com/reference/surfaces/formatting#escaping
+    This applies escaping rules as documented on
+    https://api.slack.com/reference/surfaces/formatting#escaping
     """
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 

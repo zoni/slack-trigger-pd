@@ -4,13 +4,12 @@ import os
 
 import azure.functions as func
 import pdpyras
-
-from slack_sdk.web.client import WebClient as SlackWebClient
 from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.client import WebClient as SlackWebClient
 
 from slackhandler.handlers import (
-    handle_incident_trigger,
     handle_block_suggestion,
+    handle_incident_trigger,
     handle_view_submission,
 )
 from slackhandler.state import State
@@ -27,8 +26,8 @@ if (SENTRY_DSN := os.environ.get("SENTRY_DSN")) is not None:
 # See also:
 # https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=azurecli-linux%2Capplication-level#global-variables
 _pd_client = pdpyras.APISession(
-    os.environ["PAGERDUTY_API_KEY"],
-    default_from=os.environ["PAGERDUTY_USER_EMAIL"])
+    os.environ["PAGERDUTY_API_KEY"], default_from=os.environ["PAGERDUTY_USER_EMAIL"]
+)
 _slack_client = SlackWebClient(token=os.environ["SLACK_API_TOKEN"])
 _state = State(pd_client=_pd_client, slack_client=_slack_client)
 
@@ -53,7 +52,8 @@ def _handle_request(req: func.HttpRequest) -> func.HttpResponse:
         logging.warning(
             "Missing or invalid Slack signature on request. Secret=%s, Headers=%s",
             os.environ["SLACK_SIGNING_SECRET"],
-            req.headers.__dict__['__http_headers__'])
+            req.headers.__dict__["__http_headers__"],
+        )
         return func.HttpResponse(
             "Unauthorized: missing or invalid Slack signature",
             status_code=403,

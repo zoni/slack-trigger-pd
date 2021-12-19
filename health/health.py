@@ -1,8 +1,8 @@
+import concurrent.futures
+import os
+
 import azure.functions as func
 import pdpyras
-import os
-import concurrent.futures
-
 from slack_sdk.web.client import WebClient as SlackWebClient
 
 
@@ -28,14 +28,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     results = {}
     failures = False
 
-    with concurrent.futures.ThreadPoolExecutor(
-            max_workers=len(checks)) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(checks)) as executor:
         # futures maps the check names from above to a
         # concurrent.futures.Future object, scheduled for immediate execution
         # on the threadpool.
         futures = {
-            check: executor.submit(function)
-            for check, function in checks.items()
+            check: executor.submit(function) for check, function in checks.items()
         }
         for check, future in futures.items():
             try:
@@ -48,6 +46,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 results[check] = "ERROR: " + str(exception).replace("\n", " ")
                 failures = True
 
-    return func.HttpResponse("".join(
-        [f"{check}: {result}\n" for check, result in results.items()]),
-                             status_code=503 if failures else 200)
+    return func.HttpResponse(
+        "".join([f"{check}: {result}\n" for check, result in results.items()]),
+        status_code=503 if failures else 200,
+    )

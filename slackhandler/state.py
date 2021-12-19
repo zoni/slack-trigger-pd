@@ -1,5 +1,6 @@
 import logging
 import threading
+
 import pdpyras
 import slack_sdk.web.client
 
@@ -18,6 +19,7 @@ class State:
           only has 3 seconds to respond to Slack requests, so if PagerDuty's
           API were to be slow, we might miss this deadline.
     """
+
     def __init__(
         self,
         pd_client: pdpyras.APISession,

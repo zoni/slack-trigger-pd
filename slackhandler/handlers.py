@@ -1,8 +1,9 @@
-import uuid
 import json
+import uuid
+
 import azure.functions as func
 
-from slackhandler.modals import incident_modal_payload, incident_created_modal_payload
+from slackhandler.modals import incident_created_modal_payload, incident_modal_payload
 
 
 def handle_incident_trigger(state, req: func.HttpRequest) -> func.HttpResponse:
